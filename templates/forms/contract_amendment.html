@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labour Contract Amendment - PAN HOME</title>
+    <style>
+        /* --- A4 Paper Standard CSS --- */
+        :root {
+            --font-size: 12px;
+            --input-height: 20px;
+        }
+
+        body {
+            background-color: #525659;
+            font-family: 'Times New Roman', Times, serif; /* Letter style font */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper {
+            background: white;
+            width: 210mm;
+            height: 297mm; /* A4 Height */
+            padding: 15mm 20mm; /* Standard Letter Margins */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .logo { width: 140px; }
+        
+        .date-section {
+            text-align: right;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .form-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-decoration: underline;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+
+        /* --- Letter Body --- */
+        .letter-body {
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* --- Inputs --- */
+        input[type="text"], input[type="date"] {
+            border: none;
+            border-bottom: 1px solid #000;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: bold;
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        /* Auto-fill Highlight */
+        .search-input { background-color: #f0f8ff; border-bottom: 2px solid #007bff !important; }
+
+        /* --- Checkboxes --- */
+        .checkbox-section {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px dashed #999;
+            display: flex;
+            justify-content: space-around;
+            font-weight: bold;
+        }
+
+        /* --- Comparison Table --- */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .comparison-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            vertical-align: top;
+            width: 50%;
+        }
+        .comparison-header {
+            text-align: center;
+            font-weight: bold;
+            background: #e0e0e0;
+            padding: 8px;
+            border-bottom: 1px solid #000;
+        }
+
+        .field-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .field-label { font-weight: bold; }
+
+        /* --- Signatures --- */
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .sig-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .sig-box {
+            width: 45%;
+        }
+        .sig-line {
+            border-bottom: 1px solid #000;
+            margin-top: 30px;
+        }
+
+        /* --- Screen Buttons --- */
+        .screen-only { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 8px 15px; color: white; border-radius: 4px; text-decoration: none; font-size: 12px; text-align: center; border:none; cursor: pointer; }
+        .btn-print { background: #2c3e50; }
+        .btn-close { background: #c0392b; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .paper { box-shadow: none; width: 100%; height: 100vh; margin: 0; border: none; }
+            .screen-only { display: none; }
+            .search-input { background: transparent !important; border: none !important; }
+            .checkbox-section { border: none; } /* Remove dash border on print */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-only">
+        <button onclick="window.print()" class="btn btn-print">🖨️ Print</button>
+        <a href="/dashboard" class="btn btn-close">❌ Close</a>
+    </div>
+
+    <div class="paper">
+        <div class="header">
+            <div></div> <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PAN HOME" class="logo">
+        </div>
+
+        <div class="date-section">
+            Date: <input type="date" id="app_date" style="width: 120px;">
+        </div>
+
+        <div class="form-title">Labour Contract Amendment Request Form</div>
+
+        <div class="letter-body">
+            <strong>To,<br>
+            The Head - HR<br>
+            HR Department,<br>
+            Pan Home, UAE</strong>
+            <br><br>
+            <strong>Dear Sir,</strong>
+            <br><br>
+            I, <input type="text" id="emp_name" placeholder="Employee Name" style="width: 250px;">, 
+            Employee No. <input type="text" id="emp_id" class="search-input" placeholder="ID" style="width: 80px;" onblur="fetchEmployeeDetails()"> 
+            holder of <input type="text" placeholder="Nationality" style="width: 150px;"> 
+            Passport No: <input type="text" placeholder="Passport Number" style="width: 150px;"> 
+            request you to kindly amend the following in my labour contract.
+        </div>
+
+        <div class="letter-body" style="margin-bottom: 5px;">
+            (Please tick for the appropriate below)
+        </div>
+        <div class="checkbox-section">
+            <label><input type="checkbox"> Designation / Profession Change</label>
+            <label><input type="checkbox"> Salary Change</label>
+        </div>
+
+        <table class="comparison-table">
+            <tr>
+                <td>
+                    <div class="comparison-header">Current Contract Details</div>
+                    <br>
+                    <div class="field-row">
+                        <span class="field-label">Date of Issue:</span>
+                        <input type="date" style="width: 120px;">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Date of Expiry:</span>
+                        <input type="date" style="width: 120px;">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Profession:</span>
+                        <input type="text" id="emp_pos" style="width: 140px;" placeholder="Current Pos">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Salary:</span>
+                        <input type="text" style="width: 140px;">
+                    </div>
+                </td>
+                <td>
+                    <div class="comparison-header">Requested Contract Details</div>
+                    <br>
+                    <div class="field-row">
+                        <span class="field-label">Date of Issue:</span>
+                        <input type="date" style="width: 120px;">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Date of Expiry:</span>
+                        <input type="date" style="width: 120px;">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Profession:</span>
+                        <input type="text" style="width: 140px;">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Salary:</span>
+                        <input type="text" style="width: 140px;">
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="signature-section">
+            <div style="text-align: right;">
+                <input type="text" style="width: 200px; border:none; border-bottom:1px solid #000;">
+                <br><strong>Employee Signature</strong>
+            </div>
+
+            <div class="sig-row">
+                <div class="sig-box">
+                    <strong>Manager / Location Head Approval:</strong>
+                    <div class="sig-line"></div>
+                    <div style="margin-top: 5px;">
+                        Location: <input type="text" id="emp_loc" style="width: 150px;">
+                    </div>
+                </div>
+                <div class="sig-box">
+                    <strong>Head - HR:</strong>
+                    <div class="sig-line"></div>
+                </div>
+            </div>
+
+            <div>
+                <strong>Remarks (if any):</strong>
+                <input type="text" style="width: 100%; border-bottom: 1px solid #000; text-align: left;">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('app_date').valueAsDate = new Date();
+
+        function fetchEmployeeDetails() {
+            var empId = document.getElementById('emp_id').value.trim();
+            if (!empId) return;
+
+            // Optional: User can type manually, but this helps
+            fetch('/get-employee/' + encodeURIComponent(empId))
+            .then(res => res.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('emp_name').value = data.name;
+                    document.getElementById('emp_pos').value = data.position; // Fills Current Profession
+                    document.getElementById('emp_loc').value = data.location;
+                }
+            })
+            .catch(err => console.log("Manual entry allowed."));
+        }
+    </script>
+</body>
+</html>

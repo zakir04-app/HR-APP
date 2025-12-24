@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport Release Request - PAN HOME</title>
+    <style>
+        /* --- A4 Paper Standard (Clean Doc Style) --- */
+        :root {
+            --font-size: 13px;
+            --input-height: 20px;
+        }
+
+        body {
+            background-color: #525659;
+            font-family: 'Times New Roman', Times, serif; /* Doc Font */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper {
+            background: white;
+            width: 210mm;
+            height: 297mm; /* Fixed A4 Height */
+            padding: 15mm 20mm; /* Standard Margins */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo { width: 140px; }
+        
+        .form-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-decoration: underline;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        /* --- Date --- */
+        .date-row {
+            text-align: right;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* --- Inputs (Lines Only) --- */
+        .field-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .label {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 100px;
+        }
+
+        input[type="text"], input[type="date"] {
+            border: none;
+            border-bottom: 1px solid #000; /* Line Style */
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            padding-bottom: 2px;
+            flex-grow: 1;
+            color: #000;
+        }
+
+        /* Highlight Auto-fill */
+        .search-input { background-color: #f0f8ff; border-bottom: 2px solid #007bff !important; }
+
+        /* --- Double Column Row --- */
+        .double-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .double-item {
+            display: flex;
+            align-items: flex-end;
+            width: 48%;
+        }
+        .double-item input { width: 100%; }
+
+        /* --- Checkboxes --- */
+        .checkbox-section {
+            margin: 20px 0;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+        }
+        .checkbox-item { display: flex; align-items: center; width: 45%; }
+        .checkbox-item input { transform: scale(1.3); margin-right: 10px; }
+
+        /* --- Undertaking --- */
+        .undertaking-text {
+            margin-top: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: justify;
+            font-style: italic;
+        }
+
+        /* --- Signatures (4 Columns) --- */
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .sign-box { width: 22%; } /* Adjusted for 4 columns */
+        .sign-line {
+            border-top: 1px solid #000;
+            margin-top: 50px;
+            padding-top: 5px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        /* --- Footer --- */
+        .doc-footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 15mm;
+            right: 15mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
+
+        /* --- Screen Buttons --- */
+        .screen-only { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 8px 15px; color: white; border-radius: 4px; text-decoration: none; font-size: 12px; text-align: center; border:none; cursor: pointer; }
+        .btn-print { background: #2c3e50; }
+        .btn-close { background: #c0392b; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .paper { box-shadow: none; width: 100%; height: 100vh; margin: 0; border: none; }
+            .screen-only { display: none; }
+            .search-input { background: transparent !important; border: none !important; }
+            .checkbox-section { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-only">
+        <button onclick="window.print()" class="btn btn-print">🖨️ Print</button>
+        <a href="/dashboard" class="btn btn-close">❌ Close</a>
+    </div>
+
+    <div class="paper">
+        <div class="header-row">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PAN HOME" class="logo">
+            <div class="date-row">
+                Date: <input type="date" id="app_date" style="width: 140px; text-align: center;">
+            </div>
+        </div>
+
+        <div class="form-title">PASSPORT RELEASE REQUEST FORM</div>
+
+        <div class="double-row">
+            <div class="double-item">
+                <span class="label">Name:</span>
+                <input type="text" id="emp_name" readonly placeholder="Auto-fills...">
+            </div>
+            <div class="double-item">
+                <span class="label">Employee No:</span>
+                <input type="text" id="emp_id" class="search-input" placeholder="Enter ID" onblur="fetchEmployeeDetails()">
+            </div>
+        </div>
+
+        <div class="double-row">
+            <div class="double-item">
+                <span class="label">Designation:</span>
+                <input type="text" id="emp_pos" readonly>
+            </div>
+            <div class="double-item">
+                <span class="label">Department:</span>
+                <input type="text" id="emp_dept" readonly>
+            </div>
+        </div>
+
+        <div class="double-row">
+            <div class="double-item">
+                <span class="label">Location:</span>
+                <input type="text" id="emp_loc" readonly>
+            </div>
+            <div class="double-item">
+                <span class="label">Mobile No:</span>
+                <input type="text">
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <div class="field-row">
+                <span class="label">Purpose of Release:</span>
+                <input type="text" placeholder="e.g. Visa Renewal">
+            </div>
+
+            <div class="checkbox-section">
+                <div class="checkbox-item"><input type="checkbox"> Visa Stamping / Renewal</div>
+                <div class="checkbox-item"><input type="checkbox"> Annual Leave Travel</div>
+                <div class="checkbox-item"><input type="checkbox"> Official Mission</div>
+                <div class="checkbox-item"><input type="checkbox"> Personal Requirement</div>
+            </div>
+
+            <div class="double-row">
+                <div class="double-item">
+                    <span class="label">Required Date:</span>
+                    <input type="date">
+                </div>
+                <div class="double-item">
+                    <span class="label">Exp. Return Date:</span>
+                    <input type="date">
+                </div>
+            </div>
+        </div>
+
+        <div class="undertaking-text">
+            <strong>UNDERTAKING:</strong><br><br>
+            I hereby acknowledge the receipt of my original passport from the HR Department for the purpose mentioned above. 
+            I undertake to return the passport to the HR Department immediately upon completion of the purpose or by the expected return date mentioned above, whichever is earlier. 
+            I understand that I am responsible for the safe custody of my passport during this period.
+        </div>
+
+        <div class="signature-section">
+            <div class="sign-box">
+                <div class="sign-line">Employee Signature</div>
+            </div>
+            <div class="sign-box">
+                <div class="sign-line">WH Head</div>
+            </div>
+            <div class="sign-box">
+                <div class="sign-line">Operation Manager</div>
+            </div>
+            <div class="sign-box">
+                <div class="sign-line">HR Manager</div>
+            </div>
+        </div>
+
+        <div class="doc-footer">
+            <span>PE – Passport Release Form – Ver 1.0</span>
+            <span>PAN HOME</span>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('app_date').valueAsDate = new Date();
+
+        function fetchEmployeeDetails() {
+            var empId = document.getElementById('emp_id').value.trim();
+            if (!empId) return;
+
+            document.getElementById('emp_name').value = "Loading...";
+
+            fetch('/get-employee/' + encodeURIComponent(empId))
+            .then(res => res.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('emp_name').value = data.name;
+                    document.getElementById('emp_pos').value = data.position;
+                    document.getElementById('emp_dept').value = data.department;
+                    document.getElementById('emp_loc').value = data.location;
+                } else {
+                    document.getElementById('emp_name').value = "";
+                    alert("ID not found in database.");
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>

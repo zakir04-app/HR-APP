@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Dues Form - PAN HOME</title>
+    <style>
+        /* --- Compact A4 Settings --- */
+        :root {
+            --font-size: 10px; 
+            --input-height: 16px;
+        }
+
+        body {
+            background-color: #525659;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper {
+            background: white;
+            width: 210mm;
+            height: 297mm; /* Fixed A4 Height */
+            padding: 10mm 15mm; /* Margins */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; /* Strict one page */
+        }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; color: #333; }
+        .logo { width: 120px; }
+
+        /* --- Tables --- */
+        table { width: 100%; border-collapse: collapse; font-size: var(--font-size); table-layout: fixed; }
+        th, td { border: 1px solid #666; padding: 2px 5px; vertical-align: middle; height: 18px; }
+        
+        .label { font-weight: bold; color: #333; font-size: 10px; }
+        .section-header { background: #e0e0e0; font-weight: bold; text-align: left; padding-left: 5px; }
+        .center-text { text-align: center; }
+
+        /* --- Inputs --- */
+        input[type="text"], input[type="date"], select {
+            width: 100%; border: none; outline: none; background: transparent;
+            font-family: inherit; font-size: 10px; font-weight: 600;
+            height: var(--input-height); padding: 0; margin: 0;
+        }
+        
+        /* Auto-fill Highlight */
+        .search-input { background-color: #f0f8ff; border-bottom: 1px solid #007bff !important; }
+
+        /* --- Signatures Section --- */
+        .footer-signs {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .sign-box { 
+            width: 18%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sign-line {
+            width: 100%;
+            border-bottom: 1px solid #000;
+            height: 35px; /* Space for signature */
+            margin-bottom: 5px;
+        }
+
+        /* --- Bottom Footer Text (NEW) --- */
+        .doc-footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 15mm;
+            right: 15mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #555;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
+
+        /* --- Screen Buttons --- */
+        .screen-only { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 8px 15px; color: white; border-radius: 4px; text-decoration: none; font-size: 12px; text-align: center; border:none; cursor: pointer; }
+        .btn-print { background: #2c3e50; }
+        .btn-close { background: #c0392b; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .paper { box-shadow: none; width: 100%; height: 100vh; margin: 0; border: none; }
+            .screen-only { display: none; }
+            .search-input { background: transparent !important; border: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-only">
+        <button onclick="window.print()" class="btn btn-print">🖨️ Print</button>
+        <a href="/dashboard" class="btn btn-close">❌ Close</a>
+    </div>
+
+    <div class="paper">
+        <div class="header">
+            <div style="flex-grow: 1;">
+                <h1>No Dues Form</h1>
+            </div>
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+        </div>
+
+        <form id="noDuesForm">
+            <table style="margin-bottom: 10px;">
+                <tr>
+                    <td width="15%"><span class="label">Employee Name:</span></td>
+                    <td width="35%"><input type="text" id="emp_name" readonly placeholder="Auto-fills..."></td>
+                    <td width="15%"><span class="label">Date of Joining:</span></td>
+                    <td width="35%"><input type="text" id="emp_doj" readonly></td>
+                </tr>
+                <tr>
+                    <td><span class="label">Employee No:</span></td>
+                    <td><input type="text" id="emp_id" class="search-input" placeholder="Enter ID (e.g. E3697)" onblur="fetchEmployeeDetails()"></td>
+                    <td><span class="label">Last Working Day:</span></td>
+                    <td><input type="date" required style="cursor: pointer;"></td>
+                </tr>
+                <tr>
+                    <td><span class="label">Position:</span></td>
+                    <td><input type="text" id="emp_pos" readonly></td>
+                    <td><span class="label">Separation Type:</span></td>
+                    <td>
+                        <select>
+                            <option>Resignation</option>
+                            <option>Termination</option>
+                            <option>End of Contract</option>
+                            <option>Absconding</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="label">Grade/Location:</span></td>
+                    <td colspan="3"><input type="text" id="emp_loc"></td>
+                </tr>
+            </table>
+
+            <table>
+                <thead>
+                    <tr style="background: #ccc;">
+                        <th width="8%">S.No</th>
+                        <th width="35%">Description</th>
+                        <th width="15%">Dues Particular</th>
+                        <th width="20%">Checking Authority</th>
+                        <th width="22%">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="section-header"><td colspan="5">A) Accounts – Payroll In charge</td></tr>
+                    <tr><td class="center-text">1</td><td>Salary Advance</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">2</td><td>Travel Advance</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">3</td><td>Furniture Allowance</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">4</td><td>Company Loan</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">5</td><td>IOU</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">6</td><td>Telephone-Personal Calls</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">7</td><td>Traffic Fines</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">8</td><td>Any Other Dues</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+
+                    <tr class="section-header"><td colspan="5">B) HR - Admin</td></tr>
+                    <tr><td class="center-text">9</td><td>Bank Loan</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">10</td><td>Petrol Card</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">11</td><td>Company Car</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">12</td><td>Camera</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">13</td><td>Mobile Phone</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">14</td><td>SIM Card</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">15</td><td>ID Card/ Swipe Card</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">16</td><td>Lunch Card</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">17</td><td>Vehicle Pass</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+
+                    <tr class="section-header"><td colspan="5">C) IT</td></tr>
+                    <tr><td class="center-text">18</td><td>Laptop</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                    <tr><td class="center-text">19</td><td>Email ID Deletion</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+
+                    <tr class="section-header"><td colspan="5">D) GM</td></tr>
+                    <tr><td class="center-text">20</td><td>Notice Pay – Payable/Recoverable</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                </tbody>
+            </table>
+
+            <div class="footer-signs">
+                <div class="sign-box">
+                    <div class="sign-line"></div>
+                    Team Supervisor
+                </div>
+                <div class="sign-box">
+                    <div class="sign-line"></div>
+                    Operation Manager
+                </div>
+                <div class="sign-box">
+                    <div class="sign-line"></div>
+                    WH – Manager
+                </div>
+                <div class="sign-box">
+                    <div class="sign-line"></div>
+                    HR
+                </div>
+                <div class="sign-box">
+                    <div class="sign-line"></div>
+                    Finance
+                </div>
+            </div>
+
+            <div class="doc-footer">
+                <span>PE – No Dues Form – Aug 2014</span>
+                <span>PAN HOME</span>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        function fetchEmployeeDetails() {
+            var empId = document.getElementById('emp_id').value.trim();
+            if (!empId) return;
+
+            document.getElementById('emp_name').value = "Loading...";
+
+            fetch('/get-employee/' + encodeURIComponent(empId))
+            .then(res => res.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('emp_name').value = data.name;
+                    document.getElementById('emp_pos').value = data.position;
+                    
+                    var locInfo = data.location;
+                    if(data.grade) locInfo = data.grade + " / " + locInfo;
+                    document.getElementById('emp_loc').value = locInfo;
+                    
+                    document.getElementById('emp_doj').value = data.joining_date;
+                } else {
+                    document.getElementById('emp_name').value = "";
+                    alert("ID not found.");
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>

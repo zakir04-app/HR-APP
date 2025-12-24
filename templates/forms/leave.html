@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leave Application - PAN HOME</title>
+    <style>
+        /* --- A4 Page Setup --- */
+        body { 
+            background: #525659; 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+        }
+        .paper { 
+            background: white; 
+            width: 210mm; 
+            height: 297mm; /* Strict A4 Height */
+            padding: 10mm 15mm; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+            box-sizing: border-box; 
+            position: relative;
+            overflow: hidden; /* Content bahar na jaye */
+        }
+
+        /* --- Header --- */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        .logo { width: 130px; }
+        .form-title {
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            color: #333;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        /* --- Tables (The Core Design) --- */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 11px; 
+            margin-bottom: 10px; 
+            table-layout: fixed; /* Fixed columns */
+        }
+        th, td { 
+            border: 1px solid #777; 
+            padding: 4px 6px; 
+            vertical-align: middle; 
+            height: 22px; 
+        }
+        
+        .label { font-weight: bold; color: #333; display: block; margin-bottom: 2px; }
+        .section-header { 
+            background: #e0e0e0; 
+            font-weight: bold; 
+            padding: 5px; 
+            text-align: left; 
+        }
+
+        /* --- Inputs --- */
+        input[type="text"], input[type="date"], input[type="number"], select {
+            width: 100%; 
+            border: none; 
+            outline: none; 
+            background: transparent; 
+            font-family: inherit; 
+            font-size: 11px; 
+            font-weight: bold; 
+            padding: 0;
+            color: #000;
+        }
+
+        /* Highlight Search Box */
+        .search-input { 
+            background-color: #f0f8ff; 
+            border-bottom: 2px solid #007bff !important; 
+        }
+
+        /* Inline Inputs (Lines inside text) */
+        .inline-input {
+            border-bottom: 1px solid #000 !important;
+            width: auto !important;
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* --- Checkboxes --- */
+        .checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-item { 
+            width: 30%; 
+            display: flex; 
+            align-items: center; 
+        }
+        .checkbox-item input { margin-right: 5px; transform: scale(1.1); }
+
+        /* --- Buttons (Screen Only) --- */
+        .screen-only { 
+            position: fixed; top: 20px; right: 20px; 
+            display: flex; flex-direction: column; gap: 10px; z-index: 1000; 
+        }
+        .btn { 
+            padding: 10px 20px; color: white; border-radius: 5px; 
+            text-decoration: none; border: none; cursor: pointer; 
+            text-align: center; font-weight: bold; font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- Print Rules --- */
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .paper { box-shadow: none; width: 100%; height: 100vh; margin: 0; border: none; }
+            .screen-only { display: none; }
+            .search-input { background: transparent !important; border: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <form method="POST">
+        
+        <div class="screen-only">
+            <button type="button" onclick="window.print()" class="btn" style="background: #2c3e50;">🖨️ Print</button>
+            <a href="/dashboard" class="btn" style="background: #c0392b;">❌ Close</a>
+            <button type="submit" class="btn" style="background: #27ae60;">💾 Save Request</button>
+        </div>
+
+        <div class="paper">
+            
+            <div class="header-row">
+                <h1 class="form-title">Leave Application Form</h1>
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+            </div>
+
+            <table>
+                <tr>
+                    <td width="50%">
+                        <span class="label">Employee Name:</span>
+                        <input type="text" name="emp_name" id="emp_name" value="{{ data.get('emp_name', '') }}" readonly placeholder="Auto-fills...">
+                    </td>
+                    <td width="50%">
+                        <span class="label">Employee Number:</span>
+                        <input type="text" name="emp_id" id="emp_id" class="search-input" value="{{ data.get('emp_id', '') }}" onblur="fetchEmployeeDetails()" placeholder="Enter ID (e.g. E4095)">
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="label">Position:</span> <input type="text" name="emp_pos" id="emp_pos" value="{{ data.get('emp_pos', '') }}"></td>
+                    <td><span class="label">Grade:</span> <input type="text" name="emp_grade" value="{{ data.get('emp_grade', '') }}"></td>
+                </tr>
+                <tr>
+                    <td><span class="label">Location:</span> <input type="text" name="emp_loc" id="emp_loc" value="{{ data.get('emp_loc', '') }}"></td>
+                    <td><span class="label">Department:</span> <input type="text" name="emp_dept" id="emp_dept" value="{{ data.get('emp_dept', '') }}"></td>
+                </tr>
+                <tr>
+                    <td><span class="label">Date of Joining:</span> <input type="text" name="emp_doj" id="emp_doj" value="{{ data.get('emp_doj', '') }}"></td>
+                    <td><span class="label">Date of Application:</span> <input type="date" name="app_date" id="app_date" value="{{ data.get('app_date', '') }}"></td>
+                </tr>
+                <tr>
+                    <td><span class="label">Visa Status:</span> <input type="text" name="visa_status" value="{{ data.get('visa_status', '') }}"></td>
+                    <td><span class="label">Period of leave due:</span> <input type="text" name="leave_due" value="{{ data.get('leave_due', '') }}"></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr class="section-header"><td>REQUEST FOR: (Please check the box of the desired leave)</td></tr>
+                <tr>
+                    <td style="padding: 10px;">
+                        <div class="checkbox-container">
+                            <label class="checkbox-item"><input type="radio" name="leave_type" value="Annual" {% if data.get('leave_type') == 'Annual' %}checked{% endif %}> Annual Leave</label>
+                            <label class="checkbox-item"><input type="radio" name="leave_type" value="Sick" {% if data.get('leave_type') == 'Sick' %}checked{% endif %}> Sick / Medical</label>
+                            <label class="checkbox-item"><input type="radio" name="leave_type" value="Maternity" {% if data.get('leave_type') == 'Maternity' %}checked{% endif %}> Maternity Leave</label>
+                            <label class="checkbox-item"><input type="radio" name="leave_type" value="Local" {% if data.get('leave_type') == 'Local' %}checked{% endif %}> Local Leave</label>
+                            <label class="checkbox-item"><input type="radio" name="leave_type" value="Haj" {% if data.get('leave_type') == 'Haj' %}checked{% endif %}> Haj Leave</label>
+                            <label class="checkbox-item" style="width: 100%;">
+                                <input type="radio" name="leave_type" value="Others"> Others: 
+                                <input type="text" name="other_leave" value="{{ data.get('other_leave', '') }}" class="inline-input" style="width: 200px !important;">
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="margin: 15px 0; font-size: 12px; font-weight: bold; border: 1px solid #ccc; padding: 10px; background: #fcfcfc;">
+                Leave Requested: &nbsp; 
+                From <input type="date" name="start_date" id="start_date" value="{{ data.get('start_date', '') }}" class="inline-input" style="width: 110px !important;" onchange="calculateDays()"> 
+                &nbsp; To <input type="date" name="end_date" id="end_date" value="{{ data.get('end_date', '') }}" class="inline-input" style="width: 110px !important;" onchange="calculateDays()"> 
+                &nbsp; Total Days <input type="number" name="total_days" id="total_days" value="{{ data.get('total_days', '') }}" class="inline-input" style="width: 50px !important;" readonly> 
+                &nbsp; Balance <input type="text" name="balance" class="inline-input" style="width: 80px !important;">
+            </div>
+
+            <table>
+                <tr class="section-header"><td>CONTACT ADDRESS WHILE ON LEAVE :</td></tr>
+                <tr><td><input type="text" name="contact_address" value="{{ data.get('contact_address', '') }}"></td></tr>
+            </table>
+
+            <div style="margin-top: 15px; border-bottom: 1px solid #ccc; padding-bottom: 15px; font-size: 11px;">
+                <div style="display: flex; margin-bottom: 10px;">
+                    <strong style="width: 100px; text-decoration: underline;">Ticket:</strong>
+                    <div style="display: flex; gap: 30px;">
+                        <label><input type="radio" name="ticket" value="Company"> Company ticket</label>
+                        <label><input type="radio" name="ticket" value="Own"> Own Ticket</label>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <strong style="width: 100px; text-decoration: underline;">Travel Sector:</strong>
+                    From <input type="text" name="travel_from" class="inline-input" style="width: 150px !important; margin: 0 10px;">
+                    To <input type="text" name="travel_to" class="inline-input" style="width: 150px !important; margin-left: 10px;">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 30px; margin-bottom: 20px; font-size: 11px;">
+                <div style="width: 45%;">
+                    <span style="font-weight: bold;">Applicant Signature:</span>
+                    <div style="border-bottom: 1px solid #000; margin-top: 20px;"></div>
+                </div>
+                <div style="width: 45%;">
+                    <span style="font-weight: bold;">Date of Application:</span>
+                    <div style="border-bottom: 1px solid #000; margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <table>
+                <tr class="section-header">
+                    <td width="50%">Direct Supervisor</td>
+                    <td width="50%">Operation Manager</td>
+                </tr>
+                <tr>
+                    <td height="50px">
+                        Granted: <label><input type="checkbox"> Yes</label> &nbsp; <label><input type="checkbox"> No</label>
+                    </td>
+                    <td valign="top">
+                        <span class="label" style="display:inline;">Remarks:</span> <input type="text" style="width: 80%; display:inline;">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline; background: #fff; padding: 5px;">
+                        FOR OFFICE USE ONLY
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="padding: 0;">
+                        <table style="width: 100%; border: none; margin: 0;">
+                            <tr>
+                                <td width="25%" rowspan="2" style="font-weight: bold; border: none; border-right: 1px solid #777; text-align: center;">Last leave details</td>
+                                <td style="border: none; border-bottom: 1px solid #777; border-right: 1px solid #777;">From <input type="date" class="inline-input"></td>
+                                <td style="border: none; border-bottom: 1px solid #777; border-right: 1px solid #777;">To <input type="date" class="inline-input"></td>
+                                <td style="border: none; border-bottom: 1px solid #777;">Days <input type="number" class="inline-input" style="width: 40px !important;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: none; border-right: 1px solid #777;">From <input type="date" class="inline-input"></td>
+                                <td style="border: none; border-right: 1px solid #777;">To <input type="date" class="inline-input"></td>
+                                <td style="border: none;">Days <input type="number" class="inline-input" style="width: 40px !important;"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr class="section-header">
+                    <td>FINANCE DEPT</td>
+                    <td>WH - MANAGER</td>
+                </tr>
+                <tr>
+                    <td height="60px" valign="top">
+                        <div style="margin-bottom: 5px;">Ticket Due: <label><input type="checkbox"> Yes</label> <label><input type="checkbox"> No</label></div>
+                        Loan/Advance: <input type="text" class="inline-input" style="width: 60% !important;">
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr class="section-header">
+                    <td>HUMAN RESOURCES</td>
+                    <td>GROUP FINANCE DIRECTOR</td>
+                </tr>
+                <tr><td height="60px"></td><td></td></tr>
+            </table>
+
+            <div style="position: absolute; bottom: 10mm; left: 15mm; font-size: 10px; color: #777;">
+                PE – Leave Form – Aug 2014
+            </div>
+
+        </div> </form>
+
+    <script>
+        // Set Today's Date
+        if (!document.getElementById('app_date').value) {
+            document.getElementById('app_date').valueAsDate = new Date();
+        }
+
+        function calculateDays() {
+            const s = document.getElementById('start_date').value;
+            const e = document.getElementById('end_date').value;
+            if (s && e) {
+                const diff = new Date(e) - new Date(s);
+                const days = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
+                document.getElementById('total_days').value = (days > 0) ? days : 0;
+            }
+        }
+
+        function fetchEmployeeDetails() {
+            var empId = document.getElementById('emp_id').value.trim();
+            if (!empId) return;
+            
+            document.getElementById('emp_name').value = "Loading...";
+            
+            fetch('/get-employee/' + encodeURIComponent(empId))
+            .then(r => r.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('emp_name').value = data.name;
+                    document.getElementById('emp_pos').value = data.position;
+                    document.getElementById('emp_dept').value = data.department;
+                    document.getElementById('emp_loc').value = data.location;
+                    document.getElementById('emp_doj').value = data.joining_date;
+                    document.getElementById('emp_grade').value = data.grade;
+                } else {
+                    document.getElementById('emp_name').value = "";
+                    alert("ID not found.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

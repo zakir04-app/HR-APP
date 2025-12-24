@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} Requests</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .list-container { max-width: 1000px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .search-box { padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #333; font-weight: bold; }
+        tr { transition: background 0.2s; }
+        tr:hover { background-color: #eef2f7; cursor: pointer; }
+        
+        .status-badge { padding: 5px 10px; background: #e3f2fd; color: #007bff; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .empty-msg { text-align: center; padding: 20px; color: #777; }
+        
+        /* Navbar */
+        .navbar { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logout-btn { text-decoration: none; color: #dc3545; font-weight: bold; border: 1px solid #dc3545; padding: 5px 15px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div style="font-weight:bold; font-size:20px;">PAN HOME HR</div>
+        <a href="/dashboard" class="logout-btn">Back to Dashboard</a>
+    </nav>
+
+    <div class="list-container">
+        <div class="list-header">
+            <h2>{{ title }} Requests</h2>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search by Employee ID..." onkeyup="filterTable()">
+        </div>
+
+        <table id="reqTable">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Date Submitted</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr onclick="window.location.href='{{ url_for(endpoint, file=req.filename) }}'">
+                    <td style="font-weight: bold; color: #2c3e50;">{{ req.emp_id }}</td>
+                    <td>{{ req.emp_name }}</td>
+                    <td>{{ req.date }}</td>
+                    <td><span class="status-badge"><i class="fas fa-edit"></i> View / Edit</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="empty-msg">No requests found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filterTable() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("reqTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0]; 
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }       
+            }
+        }
+    </script>
+</body>
+</html>

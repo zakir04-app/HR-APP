@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Advance Request - PAN HOME</title>
+    <style>
+        /* --- Compact A4 CSS (Same as Leave Form) --- */
+        :root {
+            --font-size-std: 12px;
+            --input-height: 20px;
+        }
+
+        body {
+            background-color: #525659;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper {
+            background: white;
+            width: 210mm;
+            height: 297mm; /* A4 */
+            padding: 15mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* --- Header --- */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .logo-img { width: 140px; }
+
+        /* --- Tables --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-std);
+            margin-bottom: 20px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #777;
+            padding: 6px 8px;
+            vertical-align: middle;
+            height: 25px;
+        }
+
+        /* --- Inputs --- */
+        input[type="text"], input[type="date"], input[type="number"] {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            height: var(--input-height);
+        }
+
+        /* Highlight Auto-fill Field */
+        .search-input {
+            background-color: #f0f8ff;
+            border-bottom: 2px solid #007bff !important;
+        }
+
+        .inline-input {
+            border-bottom: 1px solid #000 !important;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .label {
+            font-weight: bold;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 2px;
+            color: #333;
+        }
+
+        /* --- Checkboxes for Installments --- */
+        .installment-grid {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .checkbox-item { display: flex; align-items: center; font-weight: bold; font-size: 12px; }
+        .checkbox-item input { margin-right: 8px; transform: scale(1.2); }
+
+        /* --- Signatures --- */
+        .signature-table {
+            margin-top: 50px;
+            border: none !important;
+        }
+        .signature-table td {
+            border: none !important;
+            text-align: center;
+            vertical-align: bottom;
+            height: 60px;
+            padding: 0 10px;
+        }
+        .sign-line {
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+
+        /* --- Buttons --- */
+        .screen-actions { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 10px 15px; color: white; border-radius: 4px; text-decoration: none; font-weight: bold; text-align: center; border:none; cursor: pointer; }
+        .btn-print { background: #2c3e50; }
+        .btn-close { background: #c0392b; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .paper { box-shadow: none; width: 100%; height: 100vh; margin: 0; }
+            .screen-actions { display: none; }
+            .search-input { border: none !important; background: transparent !important; }
+            .installment-grid { background: white; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-actions">
+        <button onclick="window.print()" class="btn btn-print">🖨️ Print Form</button>
+        <a href="/dashboard" class="btn btn-close">❌ Close</a>
+    </div>
+
+    <div class="paper">
+        
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Salary Advance Request Form</h1>
+            </div>
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PAN HOME" class="logo-img">
+        </div>
+
+        <form id="salaryForm">
+            
+            <div style="text-align: right; margin-bottom: 10px; font-weight: bold; font-size: 12px;">
+                Date: <input type="date" id="app_date" class="inline-input" style="width: 120px !important;">
+            </div>
+
+            <table>
+                <tr>
+                    <td width="50%">
+                        <span class="label">Name:</span>
+                        <input type="text" id="emp_name" readonly placeholder="Auto-fills...">
+                    </td>
+                    <td width="50%">
+                        <span class="label">Employee No. (Enter & Click Out):</span>
+                        <input type="text" id="emp_id" class="search-input" placeholder="e.g. E6951" onblur="fetchEmployeeDetails()">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="label">Grade:</span>
+                        <input type="text" id="emp_grade">
+                    </td>
+                    <td>
+                        <span class="label">Designation:</span>
+                        <input type="text" id="emp_pos">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="label">Location:</span>
+                        <input type="text" id="emp_loc">
+                    </td>
+                    <td>
+                        <span class="label">Date of Joining:</span>
+                        <input type="text" id="emp_doj">
+                    </td>
+                </tr>
+            </table>
+
+            <div style="margin-top: 20px;">
+                <table style="margin-bottom: 0;">
+                    <tr>
+                        <td width="30%" style="background: #eee; font-weight: bold;">Loan Amount (AED):</td>
+                        <td><input type="number" placeholder="e.g. 300"></td>
+                    </tr>
+                    <tr>
+                        <td style="background: #eee; font-weight: bold;">Purpose:</td>
+                        <td><input type="text" placeholder="e.g. New Joiner Salary Advance"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <p style="font-weight: bold; margin-bottom: 5px;">I request you to deduct the loan amount in monthly installments of:</p>
+                <div class="installment-grid">
+                    <div class="checkbox-item"><input type="checkbox"> 2 months</div>
+                    <div class="checkbox-item"><input type="checkbox"> 4 months</div>
+                    <div class="checkbox-item"><input type="checkbox"> 6 months</div>
+                    <div class="checkbox-item">
+                        <input type="checkbox"> Other: 
+                        <input type="text" class="inline-input" style="width: 100px !important; margin-left: 5px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; font-size: 13px; font-style: italic;">
+                <p>
+                    <input type="checkbox" checked disabled> 
+                    I hereby agree to repay the uncovered portion of the loan in the event of my leaving the services of the company.
+                </p>
+            </div>
+
+            <table class="signature-table">
+                <tr>
+                    <td width="25%">
+                        <div class="sign-line">Employee’s Signature</div>
+                    </td>
+                    <td width="25%">
+                        <div class="sign-line">Operation Manager</div>
+                    </td>
+                    <td width="25%">
+                        <div class="sign-line">WH – Manager</div>
+                    </td>
+                    <td width="25%">
+                        <div class="sign-line">Human Resources</div>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="position: absolute; bottom: 15mm; left: 15mm; font-size: 10px; color: #888;">
+                Generated from PAN HOME HR Portal
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        // Set Today's Date
+        document.getElementById('app_date').valueAsDate = new Date();
+
+        function fetchEmployeeDetails() {
+            var empId = document.getElementById('emp_id').value.trim();
+            if (!empId) return;
+
+            document.getElementById('emp_name').value = "Loading...";
+
+            fetch('/get-employee/' + encodeURIComponent(empId))
+            .then(response => response.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('emp_name').value = data.name;
+                    document.getElementById('emp_pos').value = data.position;
+                    document.getElementById('emp_loc').value = data.location;
+                    document.getElementById('emp_doj').value = data.joining_date;
+                    document.getElementById('emp_grade').value = data.grade;
+                } else {
+                    alert("Employee ID '" + empId + "' not found.");
+                    document.getElementById('emp_name').value = "";
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert("Error fetching data.");
+            });
+        }
+    </script>
+</body>
+</html>

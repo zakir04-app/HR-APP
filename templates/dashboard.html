@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PAN HOME HR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="brand-area">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="header-logo">
+            <span class="portal-name">PAN HOME | HR Portal</span>
+        </div>
+        <div class="user-area">
+            <span class="user-badge"><i class="fas fa-user"></i> {{ user }}</span>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        
+        <div class="stats-section">
+            <h2><i class="fas fa-chart-pie"></i> Activity Summary</h2>
+            <div class="stats-grid">
+    <div class="stat-card total-card">
+        <div class="stat-number">{{ stats.total }}</div>
+        <div class="stat-label">Total Requests</div>
+    </div>
+    
+    <a href="/requests/leave" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.leave }}</div>
+        <div class="stat-label">Leave Apps</div>
+    </a>
+
+    <a href="/requests/passport" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.passport }}</div>
+        <div class="stat-label">Passport Req</div>
+    </a>
+
+    <a href="/requests/salary_adv" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.salary_adv }}</div>
+        <div class="stat-label">Salary Adv</div>
+    </a>
+
+    <a href="/requests/contract" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.contract }}</div>
+        <div class="stat-label">Amendments</div>
+    </a>
+    
+    <a href="/requests/salary_cert" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.salary_cert }}</div>
+        <div class="stat-label">Salary Cert</div>
+    </a>
+    
+    <a href="/requests/no_dues" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.no_dues }}</div>
+        <div class="stat-label">No Dues</div>
+    </a>
+    
+    <a href="/requests/it_access" class="stat-card" style="text-decoration: none; color: inherit;">
+        <div class="stat-number">{{ stats.it_access }}</div>
+        <div class="stat-label">IT Access</div>
+    </a>
+</div>
+
+        <div class="services-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>Services Menu</h1>
+                <a href="/upload-data" class="upload-link"><i class="fas fa-database"></i> Upload HR Data</a>
+            </div>
+
+            <div class="card-grid">
+                <a href="{{ url_for('forms.leave_application') }}" class="card">
+                    <div class="card-icon color-1"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Leave Application</h3>
+                </a>
+
+                <a href="{{ url_for('forms.salary_advance') }}" class="card">
+                    <div class="card-icon color-2"><i class="fas fa-money-bill-wave"></i></div>
+                    <h3>Salary Advance</h3>
+                </a>
+
+                <a href="{{ url_for('forms.it_access') }}" class="card">
+                    <div class="card-icon color-3"><i class="fas fa-laptop"></i></div>
+                    <h3>IT Access Request</h3>
+                </a>
+
+                <a href="{{ url_for('forms.contract_amendment') }}" class="card">
+                    <div class="card-icon color-4"><i class="fas fa-file-signature"></i></div>
+                    <h3>Contract Amendment</h3>
+                </a>
+
+                <a href="{{ url_for('forms.no_dues') }}" class="card">
+                    <div class="card-icon color-5"><i class="fas fa-file-invoice"></i></div>
+                    <h3>No Dues / Exit</h3>
+                </a>
+
+                <a href="{{ url_for('forms.salary_cert') }}" class="card">
+                    <div class="card-icon color-6"><i class="fas fa-certificate"></i></div>
+                    <h3>Salary Certificate</h3>
+                </a>
+
+                <a href="{{ url_for('forms.passport_request') }}" class="card">
+                    <div class="card-icon color-7"><i class="fas fa-passport"></i></div>
+                    <h3>Passport Request</h3>
+                </a>
+
+                <a href="{{ url_for('forms.on_duty') }}" class="card">
+                    <div class="card-icon color-8"><i class="fas fa-briefcase"></i></div>
+                    <h3>On Duty Slip</h3>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

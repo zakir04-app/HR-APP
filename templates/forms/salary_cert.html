@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Certificate Request - PAN HOME</title>
+    <style>
+        /* --- A4 Paper Standard (Clean Doc Style) --- */
+        :root {
+            --font-size: 13px;
+            --input-height: 20px;
+        }
+
+        body {
+            background-color: #525659;
+            font-family: 'Times New Roman', Times, serif; /* Doc Font */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .paper {
+            background: white;
+            width: 210mm;
+            height: 297mm; /* Fixed A4 Height */
+            padding: 15mm 20mm; /* Standard Doc Margins */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .logo { width: 140px; }
+        
+        .form-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            text-decoration: underline;
+            text-transform: uppercase;
+            line-height: 1.5;
+        }
+
+        /* --- Date --- */
+        .date-row {
+            text-align: right;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* --- Checkboxes --- */
+        .checkbox-section {
+            margin-bottom: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .checkbox-item { margin-bottom: 10px; display: flex; align-items: center; }
+        .checkbox-item input { transform: scale(1.3); margin-right: 15px; }
+
+        /* --- Input Fields (Lines Only) --- */
+        .field-row {
+            display: flex;
+            align-items: flex-end; /* Align text to bottom of line */
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .label {
+            font-weight: bold;
+            margin-right: 10px;
+            white-space: nowrap; /* Text tootay nahi */
+            min-width: 100px;
+        }
+
+        .label-long { min-width: 150px; }
+
+        input[type="text"], input[type="date"] {
+            border: none;
+            border-bottom: 1px solid #000; /* Line Style */
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            padding-bottom: 2px;
+            flex-grow: 1; /* Line fills the space */
+            color: #000;
+        }
+
+        /* Auto-fill Highlight */
+        .search-input { background-color: #f0f8ff; border-bottom: 2px solid #007bff !important; }
+
+        /* --- Flex Row for 2 items in one line --- */
+        .double-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .double-item {
+            display: flex;
+            align-items: flex-end;
+            width: 48%;
+        }
+        .double-item input { width: 100%; }
+
+        /* --- Footer Note --- */
+        .note-box {
+            font-size: 11px;
+            font-style: italic;
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px dotted #999;
+        }
+
+        /* --- Signatures (3 Columns) --- */
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .sign-box { width: 30%; }
+        .sign-line {
+            border-top: 1px solid #000;
+            margin-top: 40px;
+            padding-top: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        /* --- Bottom Branding --- */
+        .doc-footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 15mm;
+            right: 15mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
+
+        /* --- Screen Buttons --- */
+        .screen-only { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 8px 15px; color: white; border-radius: 4px; text-decoration: none; font-size: 12px; text-align: center; border:none; cursor: pointer; }
+        .btn-print { background: #2c3e50; }
+        .btn-close { background: #c0392b; }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .paper { box-shadow: none; width: 100%; height: 100vh; margin: 0; border: none; }
+            .screen-only { display: none; }
+            .search-input { background: transparent !important; border: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-only">
+        <button onclick="window.print()" class="btn btn-print">🖨️ Print</button>
+        <a href="/dashboard" class="btn btn-close">❌ Close</a>
+    </div>
+
+    <div class="paper">
+        <div class="header-row">
+            <div class="form-title" style="text-align: left;">
+                SALARY CERTIFICATE /<br>TRANSFER REQUEST FORM
+            </div>
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PAN HOME" class="logo">
+        </div>
+
+        <div class="date-row">
+            Date: <input type="date" id="app_date" style="width: 150px; text-align: center;">
+        </div>
+
+        <div class="checkbox-section">
+            <div class="checkbox-item">
+                <input type="checkbox"> Salary Certificate
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox"> Salary Transfer Letter
+            </div>
+        </div>
+
+        <div class="double-row">
+            <div class="double-item">
+                <span class="label">Name:</span>
+                <input type="text" id="emp_name" readonly placeholder="Auto-fills...">
+            </div>
+            <div class="double-item">
+                <span class="label">Employee No:</span>
+                <input type="text" id="emp_id" class="search-input" placeholder="ID" onblur="fetchEmployeeDetails()">
+            </div>
+        </div>
+
+        <div class="double-row">
+            <div class="double-item">
+                <span class="label">Location:</span>
+                <input type="text" id="emp_loc" readonly>
+            </div>
+            <div class="double-item">
+                <span class="label">Mobile No:</span>
+                <input type="text">
+            </div>
+        </div>
+
+        <div class="field-row">
+            <span class="label">Passport Number:</span>
+            <input type="text">
+        </div>
+
+        <div style="margin-top: 30px;">
+            <div class="field-row">
+                <span class="label label-long">Purpose:<br><span style="font-size:10px; font-weight:normal;">(requesting a salary cert/transfer)</span></span>
+                <input type="text" placeholder="e.g. Personal Loan">
+            </div>
+
+            <div class="field-row">
+                <span class="label label-long">Bank Name:</span>
+                <input type="text" placeholder="e.g. ADCB">
+            </div>
+
+            <div class="field-row">
+                <span class="label label-long">Location (bank):</span>
+                <input type="text" placeholder="e.g. Dubai">
+            </div>
+
+            <div class="field-row">
+                <span class="label label-long">Account Number:<br><span style="font-size:10px; font-weight:normal;">(for salary transfer only)</span></span>
+                <input type="text">
+            </div>
+
+            <div class="field-row">
+                <span class="label label-long">To be addressed to:</span>
+                <input type="text" placeholder="e.g. The Branch Manager">
+            </div>
+        </div>
+
+        <div class="note-box">
+            * Note: In case of salary transfer to a new bank, a clearance letter/no liability letter is required from the existing bank.
+        </div>
+
+        <div class="signature-section">
+            <div class="sign-box">
+                <div class="sign-line">Employee’s Signature</div>
+            </div>
+            <div class="sign-box">
+                <div class="sign-line">Manager Approval</div>
+            </div>
+            <div class="sign-box">
+                <div class="sign-line">HR Approval</div>
+            </div>
+        </div>
+
+        <div class="doc-footer">
+            <span>PE – Salary Certificate – Ver 2.0</span>
+            <span>PAN HOME</span>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('app_date').valueAsDate = new Date();
+
+        function fetchEmployeeDetails() {
+            var empId = document.getElementById('emp_id').value.trim();
+            if (!empId) return;
+
+            document.getElementById('emp_name').value = "Loading...";
+
+            fetch('/get-employee/' + encodeURIComponent(empId))
+            .then(res => res.json())
+            .then(data => {
+                if (data.found) {
+                    document.getElementById('emp_name').value = data.name;
+                    var loc = data.location;
+                    if(data.grade) loc = data.grade + " / " + loc;
+                    document.getElementById('emp_loc').value = loc;
+                } else {
+                    document.getElementById('emp_name').value = "";
+                    alert("ID not found");
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>
